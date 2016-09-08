@@ -1,6 +1,6 @@
 FROM ubuntu:trusty
 MAINTAINER Andy Martin <andy123@stanford.edu>
-# FORKED FROM https://github.com/tutumcloud/lamp / Fernando Mayo <fernando@tutum.co>, Feng Honglin <hfeng@tutum.co>
+# FORKED FROM  https://github.com/tutumcloud/lamp / Fernando Mayo <fernando@tutum.co>, Feng Honglin <hfeng@tutum.co>
 
 # Install packages
 ENV DEBIAN_FRONTEND noninteractive
