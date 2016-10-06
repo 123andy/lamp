@@ -1,0 +1,6 @@
+dbc_install='true'
+dbc_upgrade='true'
+dbc_remove=''
+dbc_dbtype='mysql'
+dbc_dbuser='admin'
+dbc_dbpass='superuser'

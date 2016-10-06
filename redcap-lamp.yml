@@ -1,0 +1,12 @@
+redcap-lamp:
+  image: 123andy/redcap-lamp
+  ports:
+    - "80:80"
+    - "3306:3306"
+  external_links:
+    - mailhog:mailhog
+mailhog:
+  image: mailhog/mailhog:latest
+  ports:
+    - "1025:1025"
+    - "8025:8025"

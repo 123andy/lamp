@@ -14,4 +14,21 @@ else
     echo "=> Using an existing volume of MySQL"
 fi
 
-exec supervisord -n
+echo "=> Setting timezone"
+sed -ri -e "s/^;?\s?date\.timezone.*/date\.timezone = ${PHP_TIMEZONE}/" /etc/php5/apache2/php.ini
+
+echo "=> Setting max_input_vars"
+sed -ri -e "s/^;?\s?max_input_vars.*/max_input_vars = ${PHP_MAX_INPUT_VARS}/" /etc/php5/apache2/php.ini
+
+echo "=> Setting php sendmail to ssmtp"
+sed -ri -e "s/^;?\s?sendmail_path.*/sendmail_path = \/usr\/sbin\/ssmtp -t/" /etc/php5/apache2/php.ini
+
+echo "=> Setting ssmtp link to mailhog"
+sed -ri -e "s/^mailhub.*/mailhub=mailhog:1025/" /etc/ssmtp/ssmtp.conf
+
+echo "=> Configuring CRON"
+crontab -l | { cat; echo "* * * * * ${PHP_CRON_COMMAND} > /dev/null"; } | crontab -
+
+
+echo "=> Starting Supervisor"
+exec supervisord -n -c "/etc/supervisor/supervisord.conf"
