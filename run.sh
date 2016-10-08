@@ -27,8 +27,7 @@ echo "=> Setting ssmtp link to mailhog"
 sed -ri -e "s/^mailhub.*/mailhub=mailhog:1025/" /etc/ssmtp/ssmtp.conf
 
 echo "=> Configuring CRON"
-crontab -l | { cat; echo "* * * * * ${PHP_CRON_COMMAND} > /dev/null"; } | crontab -
-
+crontab -l | { cat; echo "* * * * * php /var/www/html${PHP_REDCAP_FOLDER}cron.php > /dev/null 2>&1"; } | crontab -
 
 echo "=> Starting Supervisor"
 exec supervisord -n -c "/etc/supervisor/supervisord.conf"

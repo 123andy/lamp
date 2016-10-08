@@ -22,13 +22,13 @@
                 Allow from all
         </Directory>
 
-        ErrorLog ${APACHE_LOG_DIR}/error.log
+        ErrorLog /var/log/export/error.log
 
         # Possible values include: debug, info, notice, warn, error, crit,
         # alert, emerg.
         LogLevel warn
 
-        CustomLog ${APACHE_LOG_DIR}/access.log combined
+        CustomLog /var/log/export/access.log combined
 
 	#
 	# Set HTTPS environment variable if we came in over secure

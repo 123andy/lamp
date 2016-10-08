@@ -7,8 +7,6 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # Set DB 'admin' user password to REDCAP
 ENV MYSQL_PASS redcap
-#ENV APACHE_LOG_DIR
-
 
 # Install packages
 RUN apt-get update && \
@@ -29,18 +27,22 @@ RUN apt-get update && \
   && \
   echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
+# Set LOG Directories
+RUN mkdir /var/log/export && chgrp adm /var/log/export
+
 # Add image configuration and scripts
 ADD start-apache2.sh /start-apache2.sh
 ADD start-mysqld.sh /start-mysqld.sh
 ADD run.sh /run.sh
 RUN chmod 755 /*.sh
+
+# Add custom directives to the my.cnf file locally
 ADD my.cnf /etc/mysql/conf.d/my.cnf
+
+# Configure supervisord to manage processes (otherwise a docker instance can only run 1 process)
 ADD supervisord-apache2.conf /etc/supervisor/conf.d/supervisord-apache2.conf
 ADD supervisord-mysqld.conf /etc/supervisor/conf.d/supervisord-mysqld.conf
 ADD supervisord-cron.conf /etc/supervisor/conf.d/supervisord-cron.conf
-
-# Add a dummy html file
-ADD index.html /var/www/html/index.html
 
 # Remove pre-installed database
 RUN rm -rf /var/lib/mysql/*
@@ -52,6 +54,10 @@ RUN chmod 755 /*.sh
 # config to enable .htaccess
 ADD apache_default /etc/apache2/sites-available/000-default.conf
 RUN a2enmod rewrite
+
+# Add readme as a dummy html file in case someone forgets to map the redcap_webroot
+ADD README.md /var/www/html/index.html
+
 
 # enable mcrypt
 RUN php5enmod mcrypt
@@ -75,11 +81,15 @@ ENV PHP_TIMEZONE "America\/Los_Angeles"
 # Recommended by REDCap
 ENV PHP_MAX_INPUT_VARS 10000
 
+# What directory in the mounted redcap_webroot folder does redcap reside in - should be "/" or "/redcap/" in most cases...
+# This is used to set the cron task
+ENV PHP_REDCAP_FOLDER "/redcap/"
+
 # Assumes REDCap is one dir down
-ENV PHP_CRON_COMMAND "php /redcap_webroot/redcap/cron.php"
+# ENV PHP_CRON_COMMAND "php /redcap_webroot/redcap/cron.php"
 
 # Add mappable volumes
-VOLUME  [ "/redcap_webroot", "/etc/mysql", "/var/lib/mysql" ]
+VOLUME [ "/redcap_webroot", "/etc/mysql", "/var/lib/mysql", "/var/log/export" ]
 
 EXPOSE 80 3306 8025
 CMD ["/run.sh"]
