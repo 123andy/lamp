@@ -1,10 +1,9 @@
 redcap-docker
 =================
 
-[![Deploy to Tutum](https://s.tutum.co/deploy-to-tutum.svg)](https://dashboard.tutum.co/stack/deploy/)
+A customized LAMP docker image for use with REDCap (https://projectredcap.org).  
 
-A customized LAMP docker image for use with REDCap (https://projectredcap.org)
-
+This image does not include the REDCap source files which should be obtained from the consortium community page (https://community.projectredcap.org)
 
 Usage
 -----
@@ -14,12 +13,24 @@ To create a `123andy/redcap-docker` image on your local machine, install docker 
 	docker build -t 123andy/redcap-docker .
 
 
+Running your REDCap instance easier
+-----------------------------------
+If you just want to run redcap, then it is recommended you don't mess with this docker image and instead us the docker-composer
+version that wraps this process is availabe here:  
+
+https://github.com/123andy/redcap-docker-compose
+
+
 Running your LAMP docker image
 ------------------------------
 
-Start your image binding the external ports 80 and 3306 in all interfaces to your container:
+I'm first running a mailhog server to handle email as:
 
-	docker run --name redcap \
+    docker run -d -p 81:8025 --name=mailhog mailhog/mailhog
+
+Next, I fire up the redcap lamp server    
+
+	docker run --name=redcap \
 	    --link mailhog:mailhog \
 	    -v /Users/andy123/Documents/Docker/redcap_www:/redcap_webroot \
 	    -v /Users/andy123/Documents/Docker/redcap_mysql:/var/lib/mysql \
@@ -31,7 +42,7 @@ Start your image binding the external ports 80 and 3306 in all interfaces to you
 
 Test your deployment:
 
-	curl http://localhost/
+	http://localhost/
 
 
 Connecting to the bundled MySQL server from within the container
@@ -50,7 +61,7 @@ Connecting to the bundled MySQL server from outside the container
 -----------------------------------------------------------------
 
 The first time that you run your container, a new user `admin` with all privileges
-will be created in MySQL with a password of redcap.  You can also see this by viewing
+will be created in MySQL with a password of `redcap`.  You can also see this by viewing
 the docker logs by running:
 
 	docker logs $CONTAINER_ID
